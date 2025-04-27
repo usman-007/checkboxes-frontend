@@ -23,12 +23,88 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
   const [error, setError] = useState<string | null>(null);
   // Ref to store references to the input elements for animation triggering
   const inputRefs = useRef<(HTMLInputElement | null)[][]>([]);
+  // WebSocket reference
+  const socketRef = useRef<WebSocket | null>(null);
 
   // Initialize refs array - ensures it matches grid dimensions
   useEffect(() => {
     inputRefs.current = Array(gridSize)
       .fill(null)
       .map(() => Array(gridSize).fill(null));
+  }, [gridSize]);
+
+  // --- WebSocket Connection Setup ---
+  useEffect(() => {
+    // Connect to WebSocket
+    const socket = new WebSocket("ws://localhost:8080/ws");
+    socketRef.current = socket;
+
+    // Connection opened
+    socket.addEventListener("open", () => {
+      console.log("Connected to WebSocket server");
+    });
+
+    // Listen for messages
+    socket.addEventListener("message", (event) => {
+      try {
+        // Parse the message format: "(row,column):value"
+        const messageRegex = /\((\d+),(\d+)\):(\w+)/;
+        const match = event.data.match(messageRegex);
+        
+        if (match) {
+          const row = parseInt(match[1], 10) - 1; // Convert to 0-based index
+          const col = parseInt(match[2], 10) - 1; // Convert to 0-based index
+          const value = match[3] === "true"; // Convert string to boolean
+          
+          console.log(`WebSocket update: (${row},${col}):${value}`);
+          
+          // Update grid with the new value
+          setGrid(prevGrid => {
+            // Only update if within bounds
+            if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
+              const newGrid = [...prevGrid];
+              newGrid[row] = [...prevGrid[row]];
+              newGrid[row][col] = value;
+              
+              // Trigger animation if checkbox is being checked
+              if (value === true) {
+                const inputElement = inputRefs.current[row]?.[col];
+                if (inputElement) {
+                  inputElement.classList.add("animate-shake");
+                  setTimeout(() => {
+                    inputElement?.classList.remove("animate-shake");
+                  }, 500);
+                }
+              }
+              
+              return newGrid;
+            }
+            return prevGrid;
+          });
+        } else {
+          console.warn("Received malformed WebSocket message:", event.data);
+        }
+      } catch (e) {
+        console.error("Error processing WebSocket message:", e);
+      }
+    });
+
+    // Connection closed
+    socket.addEventListener("close", () => {
+      console.log("Disconnected from WebSocket server");
+    });
+
+    // Connection error
+    socket.addEventListener("error", (error) => {
+      console.error("WebSocket error occurred:", error);
+    });
+
+    // Clean up on unmount
+    return () => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+    };
   }, [gridSize]);
 
   // --- Fetch initial state from the backend ---
@@ -63,8 +139,8 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
           if (match) {
             const rowFromApi = parseInt(match[1], 10);
             const colFromApi = parseInt(match[2], 10);
-            const rowIndex = rowFromApi - 1;
-            const colIndex = colFromApi - 1;
+            const rowIndex = rowFromApi-1;
+            const colIndex = colFromApi-1;
 
             if (
               rowIndex >= 0 &&
