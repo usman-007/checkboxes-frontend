@@ -12,7 +12,6 @@ interface CheckboxGridProps {
   gridSize?: number; // Make gridSize optional or required as needed
 }
 
-
 const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
   const [grid, setGrid] = useState<boolean[][]>(() =>
     Array(gridSize)
@@ -59,13 +58,13 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
           console.log(`WebSocket update: (${row},${col}):${value}`);
           
           // Update grid with the new value
-          setGrid(prevGrid => {
+          setGrid((prevGrid) => {
             // Only update if within bounds
             if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
               const newGrid = [...prevGrid];
               newGrid[row] = [...prevGrid[row]];
               newGrid[row][col] = value;
-              
+
               // Trigger animation if checkbox is being checked
               if (value === true) {
                 const inputElement = inputRefs.current[row]?.[col];
@@ -76,7 +75,7 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
                   }, 500);
                 }
               }
-              
+
               return newGrid;
             }
             return prevGrid;
@@ -139,8 +138,8 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
           if (match) {
             const rowFromApi = parseInt(match[1], 10);
             const colFromApi = parseInt(match[2], 10);
-            const rowIndex = rowFromApi-1;
-            const colIndex = colFromApi-1;
+            const rowIndex = rowFromApi - 1;
+            const colIndex = colFromApi - 1;
 
             if (
               rowIndex >= 0 &&
