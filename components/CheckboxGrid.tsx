@@ -34,8 +34,12 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
 
   // --- WebSocket Connection Setup ---
   useEffect(() => {
+    const websocketUrl = process.env.NEXT_PUBLIC_WS_URL;
+    if (!websocketUrl) {
+      throw new Error("NEXT_PUBLIC_WS_URL is not set");
+    }
     // Connect to WebSocket
-    const socket = new WebSocket("ws://localhost:8080/ws");
+    const socket = new WebSocket(websocketUrl);
     socketRef.current = socket;
 
     // Connection opened
@@ -49,14 +53,14 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
         // Parse the message format: "(row,column):value"
         const messageRegex = /\((\d+),(\d+)\):(\w+)/;
         const match = event.data.match(messageRegex);
-        
+
         if (match) {
           const row = parseInt(match[1], 10) - 1; // Convert to 0-based index
           const col = parseInt(match[2], 10) - 1; // Convert to 0-based index
           const value = match[3] === "true"; // Convert string to boolean
-          
+
           console.log(`WebSocket update: (${row},${col}):${value}`);
-          
+
           // Update grid with the new value
           setGrid((prevGrid) => {
             // Only update if within bounds
