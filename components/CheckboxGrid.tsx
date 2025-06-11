@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios"; // Make sure axios is installed
+import { API_URL, WEBSOCKET_URL } from "@/app/constants";
 
 // Define the expected structure of the API response
 type States = {
@@ -34,7 +35,8 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
 
   // --- WebSocket Connection Setup ---
   useEffect(() => {
-    const websocketUrl = process.env.NEXT_PUBLIC_WS_URL;
+    const websocketUrl = WEBSOCKET_URL;
+    console.log("websocketUrl", websocketUrl);
     if (!websocketUrl) {
       throw new Error("NEXT_PUBLIC_WS_URL is not set");
     }
@@ -115,9 +117,9 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
     const fetchInitialState = async () => {
       setIsLoading(true);
       setError(null);
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/checkbox`;
+      const url = `${API_URL}/checkbox`;
 
-      if (!process.env.NEXT_PUBLIC_API_URL) {
+      if (!API_URL) {
         console.error(
           "Error: NEXT_PUBLIC_API_URL environment variable is not set."
         );
@@ -222,8 +224,8 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
 
     // --- Update Backend ---
     const updateBackendState = async () => {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/checkbox`;
-      if (!process.env.NEXT_PUBLIC_API_URL) {
+      const url = `${API_URL}/checkbox`;
+      if (!API_URL) {
         console.error("API URL not set for PATCH request.");
         // Optionally revert UI or show specific error
         return;
