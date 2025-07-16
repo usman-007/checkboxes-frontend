@@ -1,3 +1,5 @@
+import { GRAFANA_DASHBOARD_URL } from "@/app/constants";
+
 // Factory function to return TSX for a specific version
 export const infoBoxContentFactory = (version: string): React.ReactNode => {
   switch (version) {
@@ -16,6 +18,21 @@ export const infoBoxContentFactory = (version: string): React.ReactNode => {
             <li>
               Backend containerized with Docker and managed using Docker
               Compose.
+            </li>
+            <li>
+              Grafana Dashboard combined with prometheus for monitoring.
+              <span className="ml-2">
+                You can view it{" "}
+                <a
+                  href={GRAFANA_DASHBOARD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 underline hover:text-blue-600"
+                >
+                  here
+                </a>
+                .
+              </span>
             </li>
           </ul>
         </>
