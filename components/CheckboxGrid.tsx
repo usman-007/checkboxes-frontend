@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios"; // Make sure axios is installed
-import { API_URL, WEBSOCKET_URL } from "@/app/constants";
+import { API_URL, GRAFANA_DASHBOARD_URL, WEBSOCKET_URL } from "@/app/constants";
 
 // Define the expected structure of the API response
 type States = {
@@ -132,7 +132,6 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
         console.log(`Fetching initial state from: ${url}`);
         const response = await axios.get<States>(url);
         const apiStates = response.data;
-        console.log("Received API states:", apiStates);
 
         const newGrid = Array(gridSize)
           .fill(null)
@@ -267,31 +266,35 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
 
   return (
     // --- Main container with dark background ---
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 p-4 md:p-8">
-      {/* --- The Grid --- */}
-      <div
-        className={`grid ${gapClass} place-items-center bg-gray-800/30 backdrop-blur-sm p-4 md:p-6 rounded-lg shadow-xl border border-gray-700/50`}
-        // Use inline style for precise column count, especially for larger grids
-        style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
-      >
-        {grid.map((rowArr, rowIndex) =>
-          rowArr.map((isChecked, colIndex) => (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              className="relative flex items-center justify-center"
-            >
-              {/* --- Custom Styled Checkbox --- */}
-              <input
-                ref={(el) => {
-                  // Assign ref to the input element
-                  if (inputRefs.current[rowIndex]) {
-                    inputRefs.current[rowIndex][colIndex] = el;
-                  }
-                }}
-                id={`checkbox-${rowIndex}-${colIndex}`} // Unique ID for label association (optional but good practice)
-                type="checkbox"
-                // --- Styling Classes ---
-                className={`
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-full flex flex-col items-center">
+        <h1 className="text-3xl font-bold text-white text-center pt-2 mb-4 select-none drop-shadow-lg">
+          400 Checkboxes!
+        </h1>
+        {/* --- The Grid --- */}
+        <div
+          className={`grid ${gapClass} place-items-center bg-gray-800/30 backdrop-blur-sm p-4 md:p-6 rounded-lg shadow-xl border border-gray-700/50`}
+          // Use inline style for precise column count, especially for larger grids
+          style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
+        >
+          {grid.map((rowArr, rowIndex) =>
+            rowArr.map((isChecked, colIndex) => (
+              <div
+                key={`${rowIndex}-${colIndex}`}
+                className="relative flex items-center justify-center"
+              >
+                {/* --- Custom Styled Checkbox --- */}
+                <input
+                  ref={(el) => {
+                    // Assign ref to the input element
+                    if (inputRefs.current[rowIndex]) {
+                      inputRefs.current[rowIndex][colIndex] = el;
+                    }
+                  }}
+                  id={`checkbox-${rowIndex}-${colIndex}`} // Unique ID for label association (optional but good practice)
+                  type="checkbox"
+                  // --- Styling Classes ---
+                  className={`
                   peer 
                   appearance-none 
                   ${checkboxSizeClass} 
@@ -310,12 +313,12 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
                   hover:border-gray-500
                   checked:hover:bg-teal-600
                 `}
-                checked={isChecked}
-                onChange={() => handleCheckboxChange(rowIndex, colIndex)}
-              />
-              {/* --- Custom Checkmark (appears when checked using peer-checked) --- */}
-              <svg
-                className={`
+                  checked={isChecked}
+                  onChange={() => handleCheckboxChange(rowIndex, colIndex)}
+                />
+                {/* --- Custom Checkmark (appears when checked using peer-checked) --- */}
+                <svg
+                  className={`
                   absolute
                   ${checkboxSizeClass} // Match size
                   p-0.5 // Padding for the checkmark
@@ -326,46 +329,60 @@ const CheckboxGrid: React.FC<CheckboxGridProps> = ({ gridSize = 20 }) => {
                   // --- Show when peer (the input) is checked ---
                   peer-checked:opacity-100
                 `}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            ))
+          )}
+        </div>
+        <a
+          href={GRAFANA_DASHBOARD_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          // className="mt-6 inline-block px-6 py-2 bg-blue-600 text-white font-bold rounded-lg shadow hover:bg-blue-700 transition text-lg text-center"
+        >
+          <button className="p-[3px] relative mt-6">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-800 rounded-lg" />
+            <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+              Grafana Monitoring Dashboard
             </div>
-          ))
-        )}
+          </button>
+        </a>
+        {/* --- Add the CSS for shake animation here if not global --- */}
+        <style jsx global>{`
+          @keyframes shake {
+            0%,
+            100% {
+              transform: translateX(0);
+            }
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+              transform: translateX(-3px);
+            }
+            20%,
+            40%,
+            60%,
+            80% {
+              transform: translateX(3px);
+            }
+          }
+          .animate-shake {
+            animation: shake 0.5s ease-in-out;
+          }
+        `}</style>
       </div>
-      {/* --- Add the CSS for shake animation here if not global --- */}
-      <style jsx global>{`
-        @keyframes shake {
-          0%,
-          100% {
-            transform: translateX(0);
-          }
-          10%,
-          30%,
-          50%,
-          70%,
-          90% {
-            transform: translateX(-3px);
-          }
-          20%,
-          40%,
-          60%,
-          80% {
-            transform: translateX(3px);
-          }
-        }
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 };

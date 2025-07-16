@@ -11,7 +11,7 @@ export default function Home() {
 
   const openInfo = () => {
     setShowInfo(true);
-    setTimeout(() => setInfoOpen(true), 10); 
+    setTimeout(() => setInfoOpen(true), 10);
   };
 
   const closeInfo = () => {
@@ -21,7 +21,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800">
       <CheckboxGrid gridSize={20} />
       <div className="fixed bottom-4 right-4 bg-gray-100 text-gray-500 px-3 py-1 rounded-full shadow text-xs font-mono opacity-80 select-none pointer-events-none">
         {VERSION}
